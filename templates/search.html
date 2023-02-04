@@ -1,0 +1,49 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% block title %}
+Поиск
+{% endblock title %}
+
+{% block content %}
+   <form action="" method="get">
+       {{ filterset.form.as_p }}
+       <input type="submit" value="Найти" />
+   </form>
+<hr>
+   {% if news %}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Дата публикации</td>
+               <td>Статья</td>
+           </tr>
+
+           {% for new in news %}
+           <tr>
+               <td>{{ new.post_title }}</td>
+               <td>{{ new.norm_date }}</td>
+               <td>{{ new.preview }}</td>
+           </tr>
+           {% endfor %}
+       </table>
+   {% else %}
+
+       <h2>Новостей нет!</h2>
+   {% endif %}
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; первая</a>
+        ...
+        <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+    {% endif %}
+
+    <span class="current">
+        Страница {{ page_obj.number }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+        ...
+        <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+    {% endif %}
+
+{% endblock content %}

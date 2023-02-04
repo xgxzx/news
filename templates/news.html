@@ -1,0 +1,60 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+<h1>Все новости</h1>
+<hr>
+<div style="text-align: center;">
+   {% if news %}
+
+
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Статья</td>
+               <td>Дата публикации</td>
+{#               {% if perms.NewsSJ.change_post or perms.NewsSJ.delete_post %}#}
+{#               <td>Действия</td>#}
+{#               {% endif %}#}
+           </tr>
+
+           {% for new in news %}
+           <tr>
+               <td>{{ new.post_title }}</td>
+               <td>{{ new.preview }}</td>
+               <td>{{ new.norm_date }}</td>
+{#           <td>#}
+{#               {% if perms.simpleapp.change_product %}#}
+{#               <a href="{% url 'edit_news' pk=post.id %}">Изменить</a>#}
+{#               {% endif %}#}
+{#               {% if perms.simpleapp.delete_product %}#}
+{#               <a href="{% url 'delete_news' post.id %}">Удалить</a>#}
+{#               {% endif %}#}
+{#           </td>#}
+           </tr>
+           {% endfor %}
+       </table>
+   {% else %}
+</div>
+
+       <h2>Новостей нет!</h2>
+   {% endif %}
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; первая</a>
+        ...
+        <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+    {% endif %}
+
+    <span class="current">
+        Страница {{ page_obj.number }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+        ...
+        <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+    {% endif %}
+{% endblock content %}
