@@ -1,6 +1,10 @@
+from django.contrib.auth.decorators import login_required
+from django.db.models import Exists, OuterRef
+from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
-from .models import Post
+from .models import Post, Category, Subscriber
 from .filters import PostFilter
 from .forms import PostForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -9,7 +13,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 class PostList(ListView):
     model = Post
     ordering = 'time_in'
-    template_name = 'news.html'
+    template_name = 'news/news.html'
     context_object_name = 'news'
     paginate_by = 10
 
@@ -26,14 +30,14 @@ class PostList(ListView):
 
 class PostDetail(DetailView):
     model = Post
-    template_name = 'new.html'
-    context_object_name = 'new'
+    template_name = 'news/post.html'
+    context_object_name = 'post'
 
 
 class PostSearch(ListView):
     model = Post
     ordering = 'time_in'
-    template_name = 'search.html'
+    template_name = 'news/search.html'
     context_object_name = 'news'
     paginate_by = 10
 
@@ -53,7 +57,7 @@ class NewCreate(PermissionRequiredMixin, CreateView):
     raise_exception = True
     form_class = PostForm
     model = Post
-    template_name = 'post_create.html'
+    template_name = 'news/post_create.html'
 
     def form_valid(self, form):
         product = form.save(commit=False)
@@ -66,7 +70,7 @@ class ArticlesCreate(PermissionRequiredMixin, CreateView):
     raise_exception = True
     form_class = PostForm
     model = Post
-    template_name = 'post_create.html'
+    template_name = 'news/post_create.html'
 
     def form_valid(self, form):
         product = form.save(commit=False)
@@ -79,8 +83,7 @@ class NewEdit(PermissionRequiredMixin, UpdateView):
     raise_exception = True
     form_class = PostForm
     model = Post
-    template_name = 'post_create.html'
-    post_detail = 'news.html'
+    template_name = 'news/post_edit.html'
 
 
 class ArticlesEdit(PermissionRequiredMixin, UpdateView):
@@ -88,19 +91,49 @@ class ArticlesEdit(PermissionRequiredMixin, UpdateView):
     raise_exception = True
     form_class = PostForm
     model = Post
-    template_name = 'post_create.html'
-    post_detail = 'news.html'
+    template_name = 'news/post_edit.html'
 
 
 class NewDelete(DeleteView):
     raise_exception = True
     model = Post
-    template_name = 'post_delete.html'
+    template_name = 'news/post_delete.html'
     success_url = reverse_lazy('posts')
 
 
 class ArticlesDelete(DeleteView):
     raise_exception = True
     model = Post
-    template_name = 'post_delete.html'
+    template_name = 'news/post_delete.html'
     success_url = reverse_lazy('posts')
+
+
+@login_required
+@csrf_protect
+def subscriptions(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('category_id')
+        category = Category.objects.get(id=category_id)
+        action = request.POST.get('action')
+
+        if action == 'subscribe':
+            Subscriber.objects.create(user=request.user, category=category)
+        elif action == 'unsubscribe':
+            Subscriber.objects.filter(
+                user=request.user,
+                category=category,
+            ).delete()
+
+    categories_with_subscriptions = Category.objects.annotate(
+        user_subscribed=Exists(
+            Subscriber.objects.filter(
+                user=request.user,
+                category=OuterRef('pk'),
+            )
+        )
+    ).order_by('name')
+    return render(
+        request,
+        'news/subscriptions.html',
+        {'categories': categories_with_subscriptions},
+    )

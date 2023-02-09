@@ -1,0 +1,22 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% block title %}
+Пост
+{% endblock title %}
+
+
+{% block content %}
+<h1>Детальная информация о новости {{post.id}}</h1>
+Автор - {{ post.author.user }}
+<br>
+Время поста - {{ post.time_in }}
+<br>
+Тип поста - {{ post.publication_type }}
+<br>
+Заголовок - {{ post.post_title|censor }}
+<br>
+Текст - {{ post.post_text|censor }}
+<br>
+Рейтинг - {{ post.rating }}
+
+{% endblock content %}

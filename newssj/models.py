@@ -56,7 +56,7 @@ class Post(models.Model):
     publication_type = models.CharField(max_length=2, choices=PUBLICATION_TYPE)
     post_title = models.CharField('Post name', max_length=256)
     time_in = models.DateTimeField('Post date', auto_now_add=True)
-    category = models.ManyToManyField("Category", through='PostCategory')
+    category = models.ManyToManyField("Category", through='PostCategory',)
     post_text = models.TextField('Post text')
     rating = models.SmallIntegerField('Post rating', default=0)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
@@ -105,3 +105,16 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.comment_text}'
+
+
+class Subscriber(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='Subscriber',
+    )
+    category = models.ForeignKey(
+        to='Category',
+        on_delete=models.CASCADE,
+        related_name='Subscriber',
+    )

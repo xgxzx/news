@@ -1,4 +1,4 @@
-from django_filters import FilterSet, ModelMultipleChoiceFilter, DateFilter
+from django_filters import FilterSet, DateFilter
 from django.forms import DateInput
 from .models import Post
 

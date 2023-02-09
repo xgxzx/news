@@ -1,0 +1,92 @@
+Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+User.objects.create_user('Shredder')
+User.objects.create_user('Krang')
+
+Создать два объекта модели Author, связанные с пользователями.
+Author.objects.create(user=User.objects.create_user('Leo'))
+Author.objects.create(user=User.objects.create_user('Raf'))
+
+Добавить 4 категории в модель Category.
+a = Category(name='politic')
+a.save()
+a = Category(name='internet')
+a.save()
+Category.objects.create(name='culture')
+Category.objects.create(name='science')
+
+Добавить 2 статьи и 1 новость.
+Author.objects.all()
+Post.objects.create(publication_type = 'NW', post_title = 'test title 1', author = Author.objects.get(id=1), post_text = 'Sweet, captured and totally humiliated. Awesome day, Leo. Awesome day...')
+Post.objects.create(post_title = 'test title 2', author = Author.objects.get(id=2), post_text = "I can't believe I'm going to say this...(imitates character from Space Heroes) Get it together, captain. You're our leader, so act like one!")
+Post.objects.create(post_title = 'test title 3', author = Author.objects.get(id=1), post_text = "Imagine if they knew who they were working for. (In a Kraang-like voice) The ones who are working for this place must punch the card that is known as the 'timecard' in the clock which is known as the clock of time.")
+
+Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+Post.objects.get(id=1).category.add(Category.objects.get(name='science'))
+Post.objects.get(id=1).category.add(Category.objects.get(id='1'))
+Post.objects.get(id=3).category.add(Category.objects.get(id='4'))
+
+Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+Comment.objects.create(user=User.objects.get(username = 'Shredder'), post = Post.objects.get(id=2), comment_text = 'You are here because the outside world rejects you. THIS is your family. I am your father. I w ant you all to become full members of the Foot.')
+Comment.objects.create(user=User.objects.get(username = 'Shredder'), post = Post.objects.get(id=1), comment_text = 'Tonight I dine on turtle soup.')
+Comment.objects.create(user=User.objects.get(username = 'Shredder'), post = Post.objects.get(id=3), comment_text = 'Sayonara you shell-backed simpletons.')
+Comment.objects.create(user=User.objects.get(username = 'Krang'), post = Post.objects.get(id=3), comment_text = 'I HATE Turtles, I despise Turtles!')
+Comment.objects.create(user=User.objects.get(username = 'Raf'), post = Post.objects.get(id=3), comment_text = 'Krang! Relax dude.')
+
+
+Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+Comment.objects.get(id=1).like()
+Comment.objects.get(id=2).like()
+Comment.objects.get(id=3).like()
+Comment.objects.get(id=4).like()
+Comment.objects.get(id=4).like()
+Comment.objects.get(id=2).dislike()
+Comment.objects.get(id=2).like()
+Comment.objects.get(id=1).like()
+Comment.objects.get(id=2).like()
+Comment.objects.get(id=3).dislike()
+Comment.objects.get(id=4).like()
+Comment.objects.get(id=4).like()
+Comment.objects.get(id=2).dislike()
+Comment.objects.get(id=2).like()
+Comment.objects.get(id=3).dislike()
+Comment.objects.get(id=4).dislike()
+Post.objects.get(id=1).like()
+Post.objects.get(id=2).like()
+Post.objects.get(id=3).like()
+Post.objects.get(id=3).like()
+Post.objects.get(id=1).dislike()
+Post.objects.get(id=3).like()
+Post.objects.get(id=2).like()
+Post.objects.get(id=1).dislike()
+Post.objects.get(id=2).like()
+Post.objects.get(id=3).like()
+Post.objects.get(id=3).like()
+Post.objects.get(id=1).like()
+Post.objects.get(id=3).dislike()
+Post.objects.get(id=2).like()
+Post.objects.get(id=1).dislike()
+
+Обновить рейтинги пользователей.
+Author.objects.get(id=1).update_rating()
+Author.objects.get(id=2).update_rating()
+
+Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+a = Author.objects.all().order_by('-rating')[1]
+a.rating
+a.user.username
+
+Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
+a = Post.objects.all().order_by('-rating')[0]
+a.time_in
+a.author.user.username
+a.rating
+a.post_title
+a.preview()
+
+Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+b = Comment.objects.filter(post_id=a.id)
+for i in b:
+    i.time_in
+    i.user.username
+    i.rating
+    i.comment_text
