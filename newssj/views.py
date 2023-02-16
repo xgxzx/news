@@ -4,11 +4,8 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
 from django.db.models import Exists, OuterRef
 from django.shortcuts import render
-from django.views import View
 from django.urls import reverse_lazy
-from django.http import HttpResponse
 from .filters import PostFilter
-from .models import Post, Category, Subscriber
 from .forms import PostForm
 from .tasks import *
 
@@ -140,9 +137,3 @@ def subscriptions(request):
         'news/subscriptions.html',
         {'categories': categories_with_subscriptions},
     )
-
-
-class Index(View):
-    def get(self, request):
-        hello.delay()
-        return HttpResponse('Hi!')
